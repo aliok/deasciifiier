@@ -6,8 +6,10 @@ Version: 1.0
 Date:    July 24, 2010
 '''
 
-#import logging
+import logging
 from turkish_tables import *
+
+logger = logging.getLogger('Deasciifier')
 
 class Deasciifier(object):
   
@@ -18,7 +20,9 @@ class Deasciifier(object):
   def turkish_correct_region(self, start, end):
     for i in range(start, end):
       if self.turkish_need_correction(i):
+        logger.debug('Correcting                       : char %s at index %s', self.text[i], str(i))
         self.turkish_toggle_accent(i)
+        logger.debug("Doesn't need correction          : char %s at index %s", self.text[i], str(i))
     return self.text
   
   
@@ -42,7 +46,8 @@ class Deasciifier(object):
     
     m = False
     if TurkishTables.turkish_pattern_table.has_key(tr.lower()):
-      pl = TurkishTables.turkish_pattern_table[tr.lower()];      # Pattern list        
+      logger.debug(" Char might need deasciification : char %s at index %s", tr, str(pos))
+      pl = TurkishTables.turkish_pattern_table[tr.lower()];      # Pattern list
       m = self.turkish_match_pattern(pos, pl);          # match
     
     # if m then char should turn into turkish else stay ascii
@@ -60,7 +65,7 @@ class Deasciifier(object):
       return not m        
   
   def turkish_match_pattern(self, pos, dlist): # dlist: decision list
-    
+    logger.debug("  Trying to match patterns for   : char %s at index %s", self.text[pos], str(pos))
     rank = len(dlist) * 2;
     text = self.turkish_get_context(pos, self.turkish_context_size)
     
@@ -68,6 +73,7 @@ class Deasciifier(object):
     s = u''
     r = None
     str_len = len(text);
+    matching_pattern_with_highest_rank = None       # only for logging purposes
     
     while start<=self.turkish_context_size:
       end = self.turkish_context_size + 1      
@@ -79,14 +85,24 @@ class Deasciifier(object):
         substr = u''.join(s)
         if dlist.has_key(substr):
           r = dlist[substr]          # lookup the pattern
+          logger.debug("     Found a pattern match for pattern       : '%15s' . Rank is : %s", substr, str(r))
+        else:
+          logger.debug("     Cannot find a pattern match for pattern : '%15s'", substr)
           
         if (r is not None) and abs(r)<abs(rank):
+          logger.debug("        New pattern has a better rank than previous one: '%15s' . Previous rank : %s", substr, str(rank))
+          matching_pattern_with_highest_rank = substr
           rank = r;
+        else:
+          if(r is not None):
+              logger.debug("        New pattern does not have a better rank        : '%15s' . Previous rank : %s", substr, str(rank))
+
         
         end += 1        
       # while (end<=len) 
       start += 1 
     # while (start<=this.turkish_context_size)
+    logger.debug("     Final matching rule is : '%15s' with rank %s", matching_pattern_with_highest_rank, str(rank))
     return rank>0
   
   def turkish_get_context(self, pos, size):
@@ -180,8 +196,11 @@ class Deasciifier(object):
       
   def deasciify(self, text):        
     self.set_text(text)
+    logger.debug("Deasciifying : '%s'", text)
     self.turkish_correct_region(0, len(self.text)-1);
-    return u''.join(self.text);
+    result = u''.join(self.text)
+    logger.debug("Result of deasciification of '%s' is : '%s'", text, result)
+    return result
   
   # Only returns positions:
   def deasciify_positions(self, text):
