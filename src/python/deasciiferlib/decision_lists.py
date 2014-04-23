@@ -9,7 +9,7 @@ Date:    July 24, 2010
 '''
 
 turkish_decision_list = {
-  "c":[{"eXe":0}, {"geXen":1}, {"geXe":0}, {"X":1}],
+  "c":[{" eXe ":0}, {" geXen ":1}, {" geXe ":0}, {"X":1}],
   "g":[{"X":0}],
   "i":[{"X":0}],
   "o":[{"X":0}],
