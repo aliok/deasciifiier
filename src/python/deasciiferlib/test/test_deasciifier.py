@@ -21,6 +21,6 @@ class SimpleTest(unittest.TestCase):
 
     def test_should_deasciifySomeWords(self):
         deasciifier_logger.setLevel(logging.DEBUG)
-        assert_that(self.deasciifier.deasciify(u'agac'), equal_to(u'a\u011fac'))
+        assert_that(self.deasciifier.deasciify(u'gece'), equal_to(u'gece'))
         deasciifier_logger.debug("\n\n\n------------------\n\n\n------------------\n\n\n------------------\n\n\n------------------\n\n\n")
-        assert_that(self.deasciifier.deasciify(u'agaclandirma calismalari'), equal_to(u'a\u011fa\xe7land\u0131rma \xe7al\u0131\u015fmalari'))
+        assert_that(self.deasciifier.deasciify(u'gecen'), equal_to(u'gecen'))
